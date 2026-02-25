@@ -1,21 +1,20 @@
 import discord
-from discord.ext import commands
+from discord import app_commands
 import os
 
+TOKEN = os.getenv("TOKEN")
+
 intents = discord.Intents.default()
-intents.message_content = True
+client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
 
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-
-@bot.event
+@client.event
 async def on_ready():
-    print("Botが起動しました")
+    await tree.sync()
+    print("スラッシュコマンド同期完了")
 
+@tree.command(name="hello", description="挨拶するよ！")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message("Hello!!! 😎")
 
-@bot.command()
-async def hello(ctx):
-    await ctx.send("こんにちは！")
-
-
-bot.run(os.environ["TOKEN"])
+client.run(TOKEN)
